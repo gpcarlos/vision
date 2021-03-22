@@ -85,7 +85,8 @@ at::Tensor PSROIAlign_backward_cpu(
 at::Tensor nms_cpu(
     const at::Tensor& dets,
     const at::Tensor& scores,
-    const double iou_threshold);
+    const double iou_threshold,
+    const bool has_mask);
 
 at::Tensor DeformConv2d_forward_cpu(
     const at::Tensor& input,

@@ -43,7 +43,7 @@ int64_t _cuda_version() {
 }
 
 TORCH_LIBRARY(torchvision, m) {
-  m.def("nms(Tensor dets, Tensor scores, float iou_threshold) -> Tensor");
+  m.def("nms(Tensor dets, Tensor scores, float iou_threshold, bool use_mask) -> Tensor");
   m.def(
       "roi_align(Tensor input, Tensor rois, float spatial_scale, int pooled_height, int pooled_width, int sampling_ratio, bool aligned) -> Tensor");
   m.def(
