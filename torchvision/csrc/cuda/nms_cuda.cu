@@ -75,7 +75,8 @@ __global__ void nms_kernel(
 
 at::Tensor nms_cuda(const at::Tensor& dets,
     const at::Tensor& scores,
-    const double iou_threshold) {
+    const double iou_threshold,
+    const bool use_mask) {
   AT_ASSERTM(dets.is_cuda(), "dets must be a CUDA tensor");
   AT_ASSERTM(scores.is_cuda(), "scores must be a CUDA tensor");
 

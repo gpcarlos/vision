@@ -3,9 +3,8 @@ from torch.jit.annotations import Tuple
 from torch import Tensor
 import torchvision
 
-
-def nms(boxes, scores, iou_threshold):
-    # type: (Tensor, Tensor, float) -> Tensor
+def nms(boxes, scores, iou_threshold, use_mask=False):
+    # type: (Tensor, Tensor, float, bool) -> Tensor
     """
     Performs non-maximum suppression (NMS) on the boxes according
     to their intersection-over-union (IoU).
@@ -37,7 +36,8 @@ def nms(boxes, scores, iou_threshold):
         of the elements that have been kept
         by NMS, sorted in decreasing order of scores
     """
-    return torch.ops.torchvision.nms(boxes, scores, iou_threshold)
+    print(f"use_mask = {use_mask}")
+    return torch.ops.torchvision.nms(boxes, scores, iou_threshold, use_mask)
 
 
 @torch.jit._script_if_tracing
@@ -69,6 +69,11 @@ def batched_nms(boxes, scores, idxs, iou_threshold):
         the elements that have been kept by NMS, sorted
         in decreasing order of scores
     """
+    print(f"boxes.shape = {boxes.shape} BATCHED NMS")
+
+    # det_pos.shape = torch.Size([16, 4])
+    # det_mask.shape = torch.Size([16, 1, 1080, 1920])    
+
     if boxes.numel() == 0:
         return torch.empty((0,), dtype=torch.int64, device=boxes.device)
     # strategy: in order to perform NMS independently per class.
@@ -79,7 +84,7 @@ def batched_nms(boxes, scores, idxs, iou_threshold):
         max_coordinate = boxes.max()
         offsets = idxs.to(boxes) * (max_coordinate + torch.tensor(1).to(boxes))
         boxes_for_nms = boxes + offsets[:, None]
-        keep = nms(boxes_for_nms, scores, iou_threshold)
+        keep = nms(boxes_for_nms, scores, iou_threshold, True)
         return keep
 
 
